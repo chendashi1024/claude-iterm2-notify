@@ -32,33 +32,15 @@ Claude 任务完成 → macOS 通知弹出
 | Python 3 + iterm2 包 | `python3 -m pip install iterm2` | iTerm2 Python API |
 | iTerm2 Python API | Settings → General → Magic → 勾选 Enable Python API | 允许脚本控制 iTerm2 |
 
-## 30 秒安装
-
-**把这段话发给 Claude Code，它会自动完成配置：**
-
-> 请帮我配置 claude-iterm2-notify。步骤：
-> 1. `brew install terminal-notifier`
-> 2. `python3 -m pip install iterm2`
-> 3. 将 iterm-activate.py 和 notify-claude-done.sh 复制到 ~/.claude/，确保脚本有执行权限
-> 4. 在 ~/.claude/settings.json 的 hooks.Stop 中添加：
-> ```json
-> {
->   "matcher": "",
->   "hooks": [{
->     "type": "command",
->     "command": "~/.claude/notify-claude-done.sh $ITERM_SESSION_ID",
->     "timeout": 60
->   }]
-> }
-> ```
-> 5. 运行 `~/.claude/notify-claude-done.sh` 测试
-> 6. 提醒我：iTerm2 → Settings → General → Magic → 勾选 Enable Python API 并重启 iTerm2
-
-或者手动执行一键脚本：
+## 一键安装
 
 ```bash
-cd claude-iterm2-notify && bash install.sh
+git clone https://github.com/chendashi1024/claude-iterm2-notify.git
 ```
+
+**把下面这段话发给 Claude Code：**
+
+> 在 claude-iterm2-notify 目录下执行 bash install.sh，完成全部安装和测试
 
 ## 手动安装
 
