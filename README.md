@@ -34,13 +34,9 @@ Claude 任务完成 → macOS 通知弹出
 
 ## 一键安装
 
-```bash
-git clone https://github.com/chendashi1024/claude-iterm2-notify.git
-```
+**复制下面这段话发给 Claude Code：**
 
-**把下面这段话发给 Claude Code：**
-
-> 在 claude-iterm2-notify 目录下执行 bash install.sh，完成全部安装和测试
+> git clone https://github.com/chendashi1024/claude-iterm2-notify.git && cd claude-iterm2-notify && bash install.sh
 
 ## 手动安装
 
