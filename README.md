@@ -24,13 +24,21 @@ Claude 任务完成 → macOS 通知弹出
 
 ## 前置要求
 
-| 组件 | 安装方式 | 用途 |
-|------|---------|------|
-| macOS + iTerm2 | 系统自带 / [iterm2.com](https://iterm2.com) | 终端 |
-| Homebrew | [brew.sh](https://brew.sh) | 安装 terminal-notifier |
-| terminal-notifier | `brew install terminal-notifier` | 发送 macOS 通知 |
-| Python 3 + iterm2 包 | `python3 -m pip install iterm2` | iTerm2 Python API |
-| iTerm2 Python API | Settings → General → Magic → 勾选 Enable Python API | 允许脚本控制 iTerm2 |
+| 组件                 | 安装方式                                            | 用途                   |
+| -------------------- | --------------------------------------------------- | ---------------------- |
+| macOS + iTerm2       | 系统自带 / [iterm2.com](https://iterm2.com)         | 终端                   |
+| Homebrew             | [brew.sh](https://brew.sh)                          | 安装 terminal-notifier |
+| terminal-notifier    | `brew install terminal-notifier`                    | 发送 macOS 通知        |
+| Python 3 + iterm2 包 | `python3 -m pip install iterm2`                     | iTerm2 Python API      |
+| iTerm2 Python API    | Settings → General → Magic → 勾选 Enable Python API | 允许脚本控制 iTerm2    |
+
+## 注意
+
+需要在macos中设置terminal-notifier的通知权限，区别如下
+
+1. 横幅，显示后几秒会消失
+2. 提醒，显示后不会消失，除非点击通知
+3. 必须点击右下角【显示】按钮，才会显示对应iterm
 
 ## 一键安装
 
@@ -56,11 +64,11 @@ git clone https://github.com/chendashi1024/claude-iterm2-notify.git && cd claude
 
 三层激活各司其职：
 
-| 层级 | 方法 | 作用 |
-|------|------|------|
-| 1 | `session.async_activate()` | 在 iTerm2 内部选中目标标签页 |
-| 2 | `window.async_activate()` | 只激活该标签页所在的窗口 |
-| 3 | `open -b com.googlecode.iterm2` | macOS 级别强制前台 |
+| 层级 | 方法                            | 作用                         |
+| ---- | ------------------------------- | ---------------------------- |
+| 1    | `session.async_activate()`      | 在 iTerm2 内部选中目标标签页 |
+| 2    | `window.async_activate()`       | 只激活该标签页所在的窗口     |
+| 3    | `open -b com.googlecode.iterm2` | macOS 级别强制前台           |
 
 ## 支持平台
 
@@ -117,14 +125,14 @@ rm -f ~/.claude/iterm-activate.py ~/.claude/notify-claude-done.sh
 
 ## 故障排查
 
-| 问题 | 原因 | 解决 |
-|------|------|------|
-| 通知不弹出 | terminal-notifier 未安装 | `brew install terminal-notifier` |
-| 点击通知无反应 | iterm2 包未安装或 Python 路径不对 | `python3 -m pip install iterm2`，确认 notify-claude-done.sh 中 PYTHON3 路径正确 |
-| 点击后显示所有窗口 | 使用了旧版 `-activate` 方案 | 确认 notify-claude-done.sh 不含 `-activate` 参数 |
-| `$ITERM_SESSION_ID` 为空 | 不在 iTerm2 中运行 | 这是正常行为，非 iTerm2 终端不会触发通知 |
-| `ModuleNotFoundError: No module named 'iterm2'` | 系统 Python 与安装 Python 不一致 | 在 notify-claude-done.sh 中指定完整 Python 路径 |
-| iTerm2 Python API 连接失败 | Python API 未启用 | Settings → General → Magic → Enable Python API → 重启 iTerm2 |
+| 问题                                            | 原因                              | 解决                                                                            |
+| ----------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------- |
+| 通知不弹出                                      | terminal-notifier 未安装          | `brew install terminal-notifier`                                                |
+| 点击通知无反应                                  | iterm2 包未安装或 Python 路径不对 | `python3 -m pip install iterm2`，确认 notify-claude-done.sh 中 PYTHON3 路径正确 |
+| 点击后显示所有窗口                              | 使用了旧版 `-activate` 方案       | 确认 notify-claude-done.sh 不含 `-activate` 参数                                |
+| `$ITERM_SESSION_ID` 为空                        | 不在 iTerm2 中运行                | 这是正常行为，非 iTerm2 终端不会触发通知                                        |
+| `ModuleNotFoundError: No module named 'iterm2'` | 系统 Python 与安装 Python 不一致  | 在 notify-claude-done.sh 中指定完整 Python 路径                                 |
+| iTerm2 Python API 连接失败                      | Python API 未启用                 | Settings → General → Magic → Enable Python API → 重启 iTerm2                    |
 
 ## License
 
