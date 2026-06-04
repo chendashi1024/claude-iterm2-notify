@@ -34,63 +34,9 @@ Claude 任务完成 → macOS 通知弹出
 
 ## 一键安装
 
-**复制下面这段话发给 Claude Code：**
-
-> git clone https://github.com/chendashi1024/claude-iterm2-notify.git && cd claude-iterm2-notify && bash install.sh
-
-## 手动安装
-
-### 1. 安装依赖
-
 ```bash
-brew install terminal-notifier
-python3 -m pip install iterm2
+git clone https://github.com/chendashi1024/claude-iterm2-notify.git && cd claude-iterm2-notify && bash install.sh
 ```
-
-### 2. 启用 iTerm2 Python API
-
-iTerm2 → **Settings** → **General** → **Magic** → 勾选 **Enable Python API** → 重启 iTerm2
-
-验证：
-
-```bash
-python3 -c "import iterm2; print('OK')"
-```
-
-### 3. 部署脚本
-
-```bash
-cp iterm-activate.py ~/.claude/
-cp notify-claude-done.sh ~/.claude/
-chmod +x ~/.claude/notify-claude-done.sh
-```
-
-### 4. 配置 Stop Hook
-
-编辑 `~/.claude/settings.json`，在 `hooks.Stop` 数组中添加：
-
-```json
-{
-  "matcher": "",
-  "hooks": [
-    {
-      "type": "command",
-      "command": "~/.claude/notify-claude-done.sh $ITERM_SESSION_ID",
-      "timeout": 60
-    }
-  ]
-}
-```
-
-> `$ITERM_SESSION_ID` 是 iTerm2 自动注入的环境变量，每个标签页唯一。Hook 执行时 shell 自动展开为具体的 session ID。
-
-### 5. 测试
-
-```bash
-~/.claude/notify-claude-done.sh
-```
-
-点击通知，确认聚焦到当前标签页。
 
 ## 工作原理
 
