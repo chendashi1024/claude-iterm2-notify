@@ -130,25 +130,17 @@ chmod +x ~/.claude/notify-claude-done.sh
 └─────────────────────────────────────────────────────────┘
 ```
 
-三层激活缺一不可：
+三层激活各司其职：
 
-| 层级 | 方法 | 单独使用时的问题 |
-|------|------|-----------------|
-| 1 | `session.async_activate()` | 聚焦了标签页，但窗口可能不在前台 |
-| 2 | `window.async_activate()` | 窗口激活了，但可能被其他应用遮挡 |
-| 3 | `open -b com.googlecode.iterm2` | macOS 强制前台，确保不被遮挡 |
+| 层级 | 方法 | 作用 |
+|------|------|------|
+| 1 | `session.async_activate()` | 在 iTerm2 内部选中目标标签页 |
+| 2 | `window.async_activate()` | 只激活该标签页所在的窗口 |
+| 3 | `open -b com.googlecode.iterm2` | macOS 级别强制前台 |
 
-只用 `terminal-notifier -activate` 会把 iTerm2 **所有**窗口拉到前台。这个方案用 Python API 代替，只激活目标窗口。
+## 支持平台
 
-## 为什么不用 `terminal-notifier -activate`
-
-| 方案 | 多窗口 | 精准聚焦 | 依赖 |
-|------|--------|---------|------|
-| `-activate com.googlecode.iterm2` | ❌ 全部弹出 | ❌ 不聚焦 | 无 |
-| `-execute` + `iterm2-focus` | ✅ | ✅ 精准 | iterm2-focus |
-| **本方案（Python API）** | ✅ 只弹目标 | ✅ 三层保障 | iterm2 Python 包 |
-
-本方案是唯一同时满足「精准聚焦」和「不干扰其他窗口」的方案。
+macOS + iTerm2 专供，Claude Code 原生集成。`$ITERM_SESSION_ID` 由 iTerm2 自动注入，无需额外配置。
 
 ## 文件说明
 
