@@ -133,6 +133,82 @@ rm -f ~/.claude/iterm-activate.py ~/.claude/notify-claude-done.sh
 | `$ITERM_SESSION_ID` 为空                        | 不在 iTerm2 中运行                | 这是正常行为，非 iTerm2 终端不会触发通知                                        |
 | `ModuleNotFoundError: No module named 'iterm2'` | 系统 Python 与安装 Python 不一致  | 在 notify-claude-done.sh 中指定完整 Python 路径                                 |
 | iTerm2 Python API 连接失败                      | Python API 未启用                 | Settings → General → Magic → Enable Python API → 重启 iTerm2                    |
+| 通知发送成功但屏幕上看不到（`-remove ALL` 能看到历史记录，系统设置 → 通知里也显示已授权） | macOS 底层 `com.apple.ncprefs.plist` 中 terminal-notifier 的 flag bit 0（横幅显示位）被意外清空，系统静默丢弃通知 | 见下方 [Bug 排查：通知静默丢弃](#bug-排查通知静默丢弃) |
+
+## Bug 排查：通知静默丢弃
+
+### 现象
+
+- 执行 `~/.claude/notify-claude-done.sh` 后，屏幕右上方没有弹出任何通知
+- 系统设置 → 通知 → terminal-notifier 显示已授权（横幅或提示都已选）
+- `terminal-notifier -remove ALL` 能看到历史通知记录，说明通知确实被发送了
+- `osascript -e 'display notification'` 可以正常弹出系统通知
+
+### 根因
+
+macOS 的通知权限存在两层控制：
+
+| 层级 | 位置 | 作用 |
+|------|------|------|
+| 系统设置 UI | 系统设置 → 通知 → terminal-notifier | 用户可见的权限开关 |
+| 底层 plist | `~/Library/Preferences/com.apple.ncprefs.plist` | 实际生效的 flag 标记位 |
+
+**关键问题**：两层控制不一致。系统设置 UI 显示正常，但底层 `com.apple.ncprefs.plist` 中 terminal-notifier 对应的 `flags` 的 **bit 0（showInNotificationCenter / 横幅显示位）= 0**，导致 macOS 在收到通知后直接静默丢弃，不展示任何 UI。
+
+这是一种「权限撕裂」——terminal-notifier 首次安装时未被 macOS 正确授权，或者系统升级后底层标记位被意外清空，但 UI 层没有同步更新。
+
+### 诊断方法
+
+```bash
+# 1. 确认通知确实被发送了
+terminal-notifier -remove ALL
+
+# 2. 发一条测试通知
+terminal-notifier -title '测试' -message 'test' -sound default
+
+# 3. 再次查看，如果能看到记录说明发送没问题
+terminal-notifier -remove ALL
+
+# 4. 检查底层 flags（关键步骤）
+python3 -c "
+import plistlib, os
+with open(os.path.expanduser('~/Library/Preferences/com.apple.ncprefs.plist'), 'rb') as f:
+    data = plistlib.load(f)
+for app in data.get('apps', []):
+    if 'terminal-notifier' in app.get('bundle-id', ''):
+        flags = app.get('flags', 0)
+        print(f'flags: {flags} ({hex(flags)})')
+        print(f'bit 0 (banner show): {\"ENABLED\" if flags & 1 else \"DISABLED — 这就是问题！\"}'  )
+"
+```
+
+### 修复方法
+
+```bash
+# 将 bit 0 置为 1，然后重启通知中心使设置生效
+python3 -c "
+import plistlib, os
+ncprefs_path = os.path.expanduser('~/Library/Preferences/com.apple.ncprefs.plist')
+with open(ncprefs_path, 'rb') as f:
+    data = plistlib.load(f)
+for app in data.get('apps', []):
+    if 'terminal-notifier' in app.get('bundle-id', ''):
+        app['flags'] = app.get('flags', 0) | 1  # 设置 bit 0
+with open(ncprefs_path, 'wb') as f:
+    plistlib.dump(data, f)
+" && killall NotificationCenter && sleep 1
+
+# 验证修复
+terminal-notifier -title '✅ 修复测试' -message '如果看到这条通知，说明 bug 已修复！' -sound default
+```
+
+### 为什么会出现这种情况
+
+常见于以下场景：
+
+- **首次安装未授权**：terminal-notifier 第一次发送通知时，macOS 的权限弹窗被用户忽略或错过，后续通知被静默丢弃
+- **系统升级**：macOS 大版本升级后，通知中心数据库迁移时部分 app 的标记位被重置
+- **辅助 App 的权限脆弱性**：terminal-notifier 是一个 `LSUIElement`（无 Dock 图标的后台 app），macOS 对这类 app 的通知权限处理比普通 app 更不稳定
 
 ## License
 
