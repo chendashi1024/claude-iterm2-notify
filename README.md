@@ -40,7 +40,21 @@ Claude 任务完成 → macOS 通知弹出
 2. 提醒，显示后不会消失，除非点击通知
 3. 必须点击右下角【显示】按钮，才会显示对应iterm
 
-## 一键安装
+## 安装
+
+### 推荐：交给 Claude Code 安装（最省事）
+
+直接把仓库地址丢给 Claude Code，它会自动完成安装、配置 hook、排查问题：
+
+> 帮我装一下这个：https://github.com/chendashi1024/claude-iterm2-notify
+
+安装完成后 Claude Code 会自动跑测试通知。如果通知没弹出来，直接对它说：
+
+> 安装完了但通知没出现，帮我排查一下
+
+Claude Code 会检查 `terminal-notifier`、iTerm2 Python API、`ncprefs.plist` flags 等所有环节，按本文档的 [故障排查](#故障排查) 和 [Bug 排查：通知静默丢弃](#bug-排查通知静默丢弃) 逐项诊断并修复。
+
+### 手动一键安装
 
 ```bash
 git clone https://github.com/chendashi1024/claude-iterm2-notify.git && cd claude-iterm2-notify && bash install.sh
