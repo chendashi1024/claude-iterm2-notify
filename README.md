@@ -120,10 +120,6 @@ Claude Code Stop hook 的入口。从 `$1` 或 `$ITERM_SESSION_ID` 获取当前 
 
 提示样式会显示「显示」和「关闭」两个按钮，点击「显示」触发跳转。
 
-### 多台机器
-
-把 `iterm-activate.py` 和 `notify-claude-done.sh` 放到 dotfiles 仓库，新机器上运行 `install.sh` 即可。
-
 ### Hook 只在 iTerm2 中生效
 
 `$ITERM_SESSION_ID` 是 iTerm2 特有的环境变量。在其他终端（Terminal.app、Warp、VS Code 终端）中运行 Claude Code 时，变量为空，脚本会跳过通知。不会报错。
